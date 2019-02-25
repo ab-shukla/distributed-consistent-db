@@ -3,6 +3,7 @@ package com.distributedConsistentDatabase.requestHandler;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -66,6 +67,18 @@ public class ClientRequestHandler {
         }
     }
 
+    @DELETE
+    @Path("keyValuePair/{key}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteValue(@PathParam("param") String key) {
+        try {
+            final boolean deleteResponse = nodeManager.deleteValueFromCluster(key);
+            return Response.status(Status.OK).entity(deleteResponse ? "TRUE" : "FALSE").build();
+        } catch (final Exception e) {
+            return Response.status(Status.SERVICE_UNAVAILABLE).entity(e).build();
+        }
+    }
+
     @POST
     @Path("internal/keyValuePair")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -76,8 +89,19 @@ public class ClientRequestHandler {
                 nodeManager.putValue(putRequest.getRequest().getKey(), putRequest.getRequest().getValue());
             return Response.status(Status.OK).entity(internalPutResponse ? "TRUE" : "FALSE").build();
         } catch (final Exception e) {
-            e.printStackTrace();
-            return Response.status(Status.FORBIDDEN).entity(e).build();
+            return Response.status(Status.SERVICE_UNAVAILABLE).entity(e).build();
+        }
+    }
+
+    @DELETE
+    @Path("internal/keyValuePair/{key}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response internalDeleteValue(@PathParam("param") String key) {
+        try {
+            final boolean internalDeleteResponse = nodeManager.delete(key);
+            return Response.status(Status.OK).entity(internalDeleteResponse ? "TRUE" : "FALSE").build();
+        } catch (final Exception e) {
+            return Response.status(Status.SERVICE_UNAVAILABLE).entity(e).build();
         }
     }
 

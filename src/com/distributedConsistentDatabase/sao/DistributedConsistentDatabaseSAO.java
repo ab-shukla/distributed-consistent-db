@@ -57,6 +57,33 @@ public class DistributedConsistentDatabaseSAO {
         }
         throw new IllegalStateException();
     }
+    public boolean deleteValue(final ClusterNode node, final String key) {
+        final String baseUrl = createBaseUrl(node);
+        final Client client = getClient();
+        final WebResource webTarget = client.resource(baseUrl).path("keyValuePair").path(key);
+
+        final ClientResponse invocationResponse = webTarget.accept(MediaType.APPLICATION_JSON)
+            .delete(ClientResponse.class);
+
+        if (invocationResponse.getStatus() == Status.OK.getStatusCode()) {
+            return "TRUE".equals(invocationResponse.getEntity(String.class));
+        }
+        throw new IllegalStateException();
+    }
+
+    public boolean internalDeleteValue(final ClusterNode node, final String key) {
+        final String baseUrl = createBaseUrl(node);
+        final Client client = getClient();
+        final WebResource webTarget = client.resource(baseUrl).path("internal").path("keyValuePair").path(key);
+
+        final ClientResponse invocationResponse = webTarget.accept(MediaType.APPLICATION_JSON)
+            .delete(ClientResponse.class);
+
+        if (invocationResponse.getStatus() == Status.OK.getStatusCode()) {
+            return "TRUE".equals(invocationResponse.getEntity(String.class));
+        }
+        throw new IllegalStateException();
+    }
 
     public String internalGetValue(final ClusterNode node, final String key) {
         final String baseUrl = createBaseUrl(node);

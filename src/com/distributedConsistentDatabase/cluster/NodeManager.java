@@ -176,4 +176,40 @@ public class NodeManager {
             return INSTANCE.dcdbSao.putValue(INSTANCE.getClusterLeader(null), key, value);
         }
     }
+
+    public synchronized boolean deleteValueFromCluster(final String key) {
+        // Leader puts the value to cluster
+        if (INSTANCE.isLeader) {
+            if (INSTANCE.keyPutsInProgress) {
+                throw new IllegalStateException("key put in progress");
+            }
+
+            INSTANCE.keyPutsInProgress = true;
+            final boolean result = delete(key);
+            // deleted from current node.. so starting with success count as 1.
+            int successCount = 1;
+            try {
+                for (final ClusterNode node : INSTANCE.clusterManager.getClusterNodes()) {
+                    try {
+                        INSTANCE.dcdbSao.internalDeleteValue(node, key);
+                        successCount++;
+                    } catch (final Exception e) {
+                        // continue to the next node. no-op
+                    }
+                }
+            } finally {
+                INSTANCE.keyPutsInProgress = false;
+            }
+
+            if (INSTANCE.clusterManager.getClusterQuorumSize() <= successCount) {
+                return result;
+            } else {
+                throw new IllegalStateException("quorum not met. quorum size: " + INSTANCE.clusterManager.getClusterQuorumSize()
+                   + ". success count: " + successCount);
+            }
+        } else {
+            // follower just redirects the request to leader.
+            return INSTANCE.dcdbSao.deleteValue(INSTANCE.getClusterLeader(null), key);
+        }
+    }
 }

@@ -25,6 +25,7 @@ These are the APIs to be used by the cluster in itself. Not to be used by extern
 ### External APIs
 * Get (/keyValuePair/{key}): Gets the value for the key.
 * Put (/keyValuePair): Puts the key/ value pair in the cluster. Returns "TRUE" if successful, "FALSE" otherwise.
+* Delete (/keyValuePair/{key}): Deleted the key/ value pair in the cluster. Returns "TRUE" if deleted, "FALSE" if the key did not exist.
 * Bootstrap (internal/bootstrap): Bootstraps a node in the cluster making it available for use. User needs to provide a *seedServer* for configuration. Returns 200 OK when successful.
 
 ## Assumptions/ Limitations
@@ -78,6 +79,11 @@ curl -X POST -H 'Content-Type: application/json' -i http://localhost:8080/Distri
 * Get data from the cluster. Sample API
 ```
 curl -X GET -i http://localhost:8083/DistributedConsistentDatabase/keyValuePair/1
+```
+
+* Delete data from the cluster. Sample API
+```
+curl -X DELETE -i http://localhost:8080/DistributedConsistentDatabase/keyValuePair/1
 ```
 
 # Contact
