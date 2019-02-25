@@ -20,9 +20,9 @@ Current implementation uses a in-memory key value store. It does not perform any
 
 ## Application layer
 The entire implementation is exposed through REST APIs which are implemented using Jersey. The APIs are of two types
-## Internal APIs
+### Internal APIs
 These are the APIs to be used by the cluster in itself. Not to be used by external clients. All these resources have *internal* in their resource path.
-## External APIs
+### External APIs
 * Get (/keyValuePair/{key}): Gets the value for the key.
 * Put (/keyValuePair): Puts the key/ value pair in the cluster. Returns "TRUE" if successful, "FALSE" otherwise.
 * Bootstrap (internal/bootstrap): Bootstraps a node in the cluster making it available for use. User needs to provide a *seedServer* for configuration. Returns 200 OK when successful.
